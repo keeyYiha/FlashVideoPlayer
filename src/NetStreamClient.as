@@ -7,17 +7,19 @@ package
     public class NetStreamClient extends NetStream
     {
         private var _video:Video;
+        private var _duration:Number;
+        
         public function NetStreamClient(connection:NetConnection, video:Video, peerID:String="connectToFMS")
         {
             _video = video;
             super(connection, peerID);
         }
         
-        public function onMetaData(data:Object):void
+        public function onMetaData(info:Object):void
         {
-            trace(data.duration);
-            var h:int = int(data.height);
-            var w:int = int(data.width);
+            _duration = info.duration;
+            var h:int = int(info.height);
+            var w:int = int(info.width);
             if (!h) return;
             if((w/h) < (4/3))
             {
@@ -33,6 +35,33 @@ package
             }
             _video.width = 400;
             _video.height = 300
+        }
+        
+        public function onPlayStatus(info:Object):void
+        {
+            trace(info);
+        }
+        
+        public function onCuePoint(info:Object):void
+        {
+            trace(info);
+        }
+        
+        public function setSeek(offset:Number=0):void
+        {
+            if (offset > _duration)
+                offset = _duration;
+            if (offset < 0)
+                offset = 0;
+            
+            trace("setSeek: " + offset);
+            
+            this.seek(offset);
+        }
+        
+        public function get duration():Number
+        {
+            return this._duration;
         }
     }
 }
