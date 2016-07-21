@@ -1,6 +1,7 @@
 package
 {
-    import AssetsUI.AssetsTimeProgressBar.AssetsTimeProgressBar;
+    import com.AssetsUI.AssetsTimeProgressBar.AssetsTimeProgressBar;
+    import com.NetStreamClient;
     
     import flash.display.Loader;
     import flash.display.Sprite;
@@ -31,7 +32,6 @@ package
         
         public function init():void
         {
-            
             connection = new NetConnection();
             connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
             connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
@@ -72,24 +72,27 @@ package
         private var _timeProgressBar:AssetsTimeProgressBar;
         private function connectStream():void 
         {
+            var Fun:Function = function()
+            {
+                //音量
+                soundTrans = new SoundTransform();
+                soundTrans.volume = 1;
+                SoundMixer.soundTransform = soundTrans;
+                
+                _timeProgressBar = new AssetsTimeProgressBar(stream.duration);
+                addChild(_timeProgressBar);
+                _timeProgressBar.y = 300;
+                
+                stage.addEventListener(MouseEvent.CLICK, videoClick);
+                addEventListener(Event.ENTER_FRAME, onEnterFrame);
+            }
             video = new Video();
-            stream = new NetStreamClient(connection, video);
+            stream = new NetStreamClient(connection, video, Fun);
             stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 //            stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
             stream.play(videoUrl);
             video.attachNetStream(stream);
             addChild(video);
-            
-            //音量
-            soundTrans = new SoundTransform();
-            soundTrans.volume = 1;
-            SoundMixer.soundTransform = soundTrans;
-            
-            _timeProgressBar = new AssetsTimeProgressBar();
-            addChild(_timeProgressBar);
-            
-            stage.addEventListener(MouseEvent.CLICK, this.videoClick);
-            addEventListener(Event.ENTER_FRAME, onEnterFrame);
         }
         
         private function videoClick(event:MouseEvent):void
@@ -99,8 +102,7 @@ package
         
         private function onEnterFrame(event:Event):void
         {
-            var percent:Number = (stream.time/stream.duration);
-            _timeProgressBar.setTimeBar(percent);
+            _timeProgressBar.setTimeBar(stream.time);
         }
     }
 }

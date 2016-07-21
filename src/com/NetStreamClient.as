@@ -1,4 +1,4 @@
-package
+package com
 {
     import flash.media.Video;
     import flash.net.NetConnection;
@@ -8,9 +8,11 @@ package
     {
         private var _video:Video;
         private var _duration:Number;
+        private var callFun:Function = null;
         
-        public function NetStreamClient(connection:NetConnection, video:Video, peerID:String="connectToFMS")
+        public function NetStreamClient(connection:NetConnection, video:Video, fun:Function, peerID:String="connectToFMS")
         {
+            callFun = fun;
             _video = video;
             super(connection, peerID);
         }
@@ -24,17 +26,23 @@ package
             if((w/h) < (4/3))
             {
                 _video.width = w/(h/300);
-                _video.height = 300
-                return;
+                _video.height = 300;
             }
-            if((w/h) > (4/3))
+            else if((w/h) > (4/3))
             {
                 _video.width = 400;
                 _video.height = h/(w/400);
-                return;
             }
-            _video.width = 400;
-            _video.height = 300
+            else
+            {
+                _video.width = 400;
+                _video.height = 300;
+            }
+            
+            if (callFun)
+            {
+                callFun();
+            }
         }
         
         public function onPlayStatus(info:Object):void

@@ -1,4 +1,4 @@
-package AssetsUI
+package com.AssetsUI
 {
     import flash.display.Loader;
     import flash.display.MovieClip;
