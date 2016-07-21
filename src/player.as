@@ -2,6 +2,7 @@ package
 {
     import com.AssetsUI.AssetsTimeProgressBar.AssetsTimeProgressBar;
     import com.NetStreamClient;
+    import com.VideoPlay;
     
     import flash.display.Loader;
     import flash.display.Sprite;
@@ -16,6 +17,7 @@ package
     import flash.net.URLRequest;
     import flash.system.ApplicationDomain;
     
+    [SWF(width="960", height="640",backgroundColor="0x000000")]
     public class player extends Sprite
     {
         private var videoUrl:String = "video/AbsoluteDuo.mp4";
@@ -27,6 +29,7 @@ package
         
         public function player()
         {
+//            this.addEventListener(
             this.init()
         }
         
@@ -72,21 +75,21 @@ package
         private var _timeProgressBar:AssetsTimeProgressBar;
         private function connectStream():void 
         {
-            var Fun:Function = function()
+            var Fun:Function = function():void
             {
                 //音量
                 soundTrans = new SoundTransform();
                 soundTrans.volume = 1;
                 SoundMixer.soundTransform = soundTrans;
                 
-                _timeProgressBar = new AssetsTimeProgressBar(stream.duration);
+                _timeProgressBar = new AssetsTimeProgressBar(stream);
                 addChild(_timeProgressBar);
                 _timeProgressBar.y = 300;
                 
                 stage.addEventListener(MouseEvent.CLICK, videoClick);
                 addEventListener(Event.ENTER_FRAME, onEnterFrame);
             }
-            video = new Video();
+            video = new VideoPlay();
             stream = new NetStreamClient(connection, video, Fun);
             stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 //            stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);

@@ -22,7 +22,6 @@ package com
             _duration = info.duration;
             var h:int = int(info.height);
             var w:int = int(info.width);
-            if (!h) return;
             if((w/h) < (4/3))
             {
                 _video.width = w/(h/300);
