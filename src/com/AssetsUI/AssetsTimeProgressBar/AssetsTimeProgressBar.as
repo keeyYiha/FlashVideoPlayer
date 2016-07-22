@@ -2,24 +2,36 @@ package com.AssetsUI.AssetsTimeProgressBar
 {
     import com.AssetsUI.AssetsUI;
     import com.NetStreamClient;
+    import com.Utils.ButtonManager;
     import com.Utils.TimeTool;
     
+    import flash.display.SimpleButton;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
     import flash.system.ApplicationDomain;
     
     public class AssetsTimeProgressBar extends AssetsUI 
     {
+        private static var instance:AssetsTimeProgressBar;
         private const UI_CLASS_NAME:String = "AssetsTimeProgressBar";
         private var timeBar:Sprite;
         private var bar:Sprite;
         private var stream:NetStreamClient;
+        private var pause:SimpleButton;
+        private var resume:SimpleButton;
         
         public function AssetsTimeProgressBar(stream:NetStreamClient)
         {
             this.stream = stream;
             super();
         }
+        
+//        public static function getInstance():AssetsTimeProgressBar
+//        {
+//            if (!instance)
+//                instance = new AssetsTimeProgressBar();
+//            return instance;
+//        }
         
         override protected function helderComplete():void
         {
@@ -31,18 +43,40 @@ package com.AssetsUI.AssetsTimeProgressBar
             
             timeBar = UIObject["timeBar"];
             bar = timeBar["bar"];
+            resume = UIObject["resume"];
+            pause = UIObject["pause"];
+            resume.visible = false;
+            
             UIObject["totalTime"].text = TimeTool.secondFormat(stream.duration);
             
-            timeBar.addEventListener(MouseEvent.CLICK, onClickTimeBar);
+            ButtonManager.attach(timeBar, this.onClick)
+            ButtonManager.attach(pause, this.onClick, "pause");
+            ButtonManager.attach(resume, this.onClick, "resume");
         }
 
-        private function onClickTimeBar(event:MouseEvent):void
+        public function onClick(t:String="", event:MouseEvent=null):void
         {
-            var percent:Number = event.currentTarget.mouseX/timeBar.width;
-            setPlayTime(percent);
-            event.stopPropagation();
-//            trace(event.currentTarget.mouseX, event.currentTarget.mouseY);
-//            trace(event);
+            switch(t)
+            {
+                case "pause":
+                    stream.pause();
+                    pause.visible = false;
+                    resume.visible = true;
+                    break;
+                case "resume":
+                    stream.resume()
+                    pause.visible = true;
+                    resume.visible = false;
+                    break;
+                default:
+                    var percent:Number = event.currentTarget.mouseX/timeBar.width;
+                    setPlayTime(percent);
+                    break;
+            }
+            if (event && event.hasOwnProperty("stopPropagation"))
+            {
+                event.stopPropagation();
+            }
         }
         
         public function setTimeBar(currT:Number):void
@@ -61,7 +95,6 @@ package com.AssetsUI.AssetsTimeProgressBar
         {
             var currTime:Number = stream.duration*percent;
             stream.setSeek(currTime);
-            setTimeBar(currTime);
         }
     }
 }

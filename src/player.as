@@ -20,7 +20,8 @@ package
     [SWF(width="960", height="640",backgroundColor="0x000000")]
     public class player extends Sprite
     {
-        private var videoUrl:String = "video/AbsoluteDuo.mp4";
+        private var videoUrl:String = "video/rmvbText.mp4";
+//        private var videoUrl:String = "video/AbsoluteDuo.mp4";
 //        private var videoUrl:String = "video/video.flv";
         private var connection:NetConnection;
         private var stream:NetStreamClient;
@@ -63,7 +64,6 @@ package
             if (event.info.code == "NetStream.Unpause.Notify") {
                 //恢复
             }
-            trace("player.netStatusHandler: " + event.info.code);
         }
         
         private function securityErrorHandler(event:SecurityErrorEvent):void
@@ -100,7 +100,11 @@ package
         
         private function videoClick(event:MouseEvent):void
         {
-            stream.togglePause();
+            if (stream.state == "pause")
+                _timeProgressBar.onClick("resume");
+            else if (stream.state == "resume")
+                _timeProgressBar.onClick("pause");
+//            stream.togglePause();
         }
         
         private function onEnterFrame(event:Event):void

@@ -9,6 +9,7 @@ package com
         private var _video:Video;
         private var _duration:Number;
         private var callFun:Function = null;
+        private var _state:String = "stop";
         
         public function NetStreamClient(connection:NetConnection, video:Video, fun:Function, peerID:String="connectToFMS")
         {
@@ -20,6 +21,7 @@ package com
         public function onMetaData(info:Object):void
         {
             _duration = info.duration;
+            _state = "resume";
             var h:int = int(info.height);
             var w:int = int(info.width);
             if((w/h) < (4/3))
@@ -69,6 +71,32 @@ package com
         public function get duration():Number
         {
             return this._duration;
+        }
+        
+        override public function pause():void
+        {
+            _state = "pause";
+            super.pause()
+        }
+        
+        override public function resume():void
+        {
+            _state = "resume";
+            super.resume()
+        }
+        
+        override public function togglePause():void
+        {
+            if (_state == "pause")
+                _state = "resume";
+            if (_state == "resume")
+                _state = "pause";
+            super.togglePause();
+        }
+        
+        public function get state():String
+        {
+            return this._state;
         }
     }
 }
